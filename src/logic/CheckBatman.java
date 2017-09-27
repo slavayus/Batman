@@ -151,12 +151,14 @@ public class CheckBatman {
         return false;
     }
 
-    public void updateRequest(HttpServletRequest request) {
-        request.setAttribute("x", getX / 7);
-        request.setAttribute("y", getY / 7);
-        request.setAttribute("zoom", getZoom);
-        request.setAttribute("inBatman", check());
-        request.setAttribute("currTime", new Date().toString());
-        request.setAttribute("time", String.valueOf(System.nanoTime() - start));
+    public DataSessionBean updateRequest(HttpServletRequest request) {
+        DataSessionBean dataSessionBean = new DataSessionBean();
+        dataSessionBean.setX(getX / 7);
+        dataSessionBean.setY(getY / 7);
+        dataSessionBean.setZoom(getZoom);
+        dataSessionBean.setInBatman(check());
+        dataSessionBean.setCurrentTime(new Date());
+        dataSessionBean.setProcessTime(System.nanoTime() - start);
+        return dataSessionBean;
     }
 }

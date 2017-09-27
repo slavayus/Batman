@@ -1,3 +1,4 @@
+
 MyFunction = function () {
     var canvas = document.getElementById('myCanvas');
     var zoom1 = document.getElementById('myRange').value;
@@ -5,6 +6,7 @@ MyFunction = function () {
     // zoom=zoom+10;
     if (canvas.getContext) {
         var ctx = canvas.getContext('2d');
+        canvas.onmousedown = drawDot;
         var zoom = zoom1 * 2.5;
         var plusX = (7 * 20) + 250;
         var plusY = (4 * 20) + 250;
@@ -74,6 +76,7 @@ MyFunction = function () {
         ctx.fillStyle = "#2aa5a0";
         ctx.fill();
         ctx.stroke();
+
         ctx.closePath();
         // ctx.restore();
 
@@ -125,6 +128,24 @@ MyFunction = function () {
 
         ctx.stroke();
     }
+};
+drawDot = function (e) {
+    var canvas = document.getElementById('myCanvas');
+    var ctx = canvas.getContext('2d');
+    var plusX = (7 * 20) + 250;
+    var plusY = (4 * 20) + 250;
+    ctx.beginPath();
+    var coords = canvas.getBoundingClientRect();
+    var x = e.pageX - coords.left - pageXOffset;
+    var y = e.pageY -  coords.top - pageYOffset;
+    var needX = Math.round((x- plusX)/7/2.5);
+    var needY = Math.round((y- plusY)/7/2.5);
+    ctx.fillStyle = "rgb(255,92,90)";
+    ctx.arc(needX * 7 * 2.5 + plusX, needY * 7 * 2.5 + plusY, 3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.closePath();
+    document.getElementById('coordX').value = needX;
+    document.getElementById('coordY').value = -needY;
 };
 getCoords = function (input) {
     checkIfFull(document.getElementById('coordX'), document.getElementById('coordY'));

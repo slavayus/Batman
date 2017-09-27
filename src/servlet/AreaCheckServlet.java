@@ -1,12 +1,14 @@
 package servlet;
 
 import logic.CheckBatman;
+import logic.DataSessionBean;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class AreaCheckServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -26,12 +28,43 @@ public class AreaCheckServlet extends HttpServlet {
     }
 
     private void doResponse(HttpServletResponse response, HttpServletRequest request) throws IOException, ServletException {
-        CheckBatman checkBatman = new CheckBatman(Integer.parseInt(request.getParameter("x")),
-                Integer.parseInt(request.getParameter("y")),
-                Integer.parseInt(request.getParameter("zoom")));
+        CheckBatman checkBatman = checkBatman(request);
+        if (checkBatman == null) {
+            request.getRequestDispatcher("/index.jsp").forward(request, response);
+        } else {
+            updateDataSession(checkBatman, request);
+            response.sendRedirect("ControllerServlet");
+//            request.getRequestDispatcher("/index.jsp").forward(request, response);
+        }
 
-        checkBatman.updateRequest(request);
-        request.getRequestDispatcher("/index.jsp").forward(request, response);
+    }
+
+    private void updateDataSession(CheckBatman checkBatman, HttpServletRequest request) throws ServletException, IOException {
+        if (request.getSession().getAttribute("data") == null) {
+            ArrayList<DataSessionBean> dataList = new ArrayList<>();
+            dataList.add(checkBatman.updateRequest(request));
+            request.getSession().setAttribute("data", dataList);
+        } else {
+            ArrayList<DataSessionBean> dataList;
+            try {
+                dataList = (ArrayList<DataSessionBean>) request.getSession().getAttribute("data");
+                dataList.add(checkBatman.updateRequest(request));
+            } catch (Exception e) {
+                //Ops..
+            }
+        }
+    }
+
+    private CheckBatman checkBatman(HttpServletRequest request) {
+        CheckBatman checkBatman = null;
+        try {
+            checkBatman = new CheckBatman(Integer.parseInt(request.getParameter("x")),
+                    Integer.parseInt(request.getParameter("y")),
+                    Integer.parseInt(request.getParameter("zoom")));
+        } catch (NumberFormatException e) {
+//            e.printStackTrace();
+        }
+        return checkBatman;
     }
 
     private void forbidden(HttpServletResponse response) throws IOException {
